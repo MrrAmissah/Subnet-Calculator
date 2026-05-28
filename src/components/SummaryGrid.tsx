@@ -172,7 +172,12 @@ export default function SummaryGrid({ result, onNavigate }: Props) {
                 Scope
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-fore">{result.ipClass}</span>
+                <span className="text-sm text-fore">
+                  {result.ipClass}
+                  {!result.ipClass.includes('(') && (
+                    <span className="ml-1.5 text-[9px] font-normal text-fore-3">classful</span>
+                  )}
+                </span>
                 <span
                   className={[
                     'rounded border px-1.5 py-0.5 text-[10px] font-medium',

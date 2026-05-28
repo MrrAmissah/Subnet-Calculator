@@ -49,7 +49,10 @@ function buildDetails(result: SubnetResult) {
       { label: 'CIDR Notation', value: `/${result.cidr}`, mono: true },
     ],
     classification: [
-      { label: 'IP Class', value: result.ipClass },
+      {
+        label: 'IP Class',
+        value: result.ipClass + (!result.ipClass.includes('(') ? ' · classful (legacy)' : ''),
+      },
       { label: 'Scope', value: result.isPrivate ? 'Private' : 'Public' },
       { label: 'RFC 1918', value: result.isPrivate ? 'Yes' : 'No' },
     ],
