@@ -2,7 +2,7 @@
 
 A fast, client-side IPv4 subnet / CIDR calculator — enter an IP and prefix, get the network, broadcast, host range, masks, and a live binary breakdown.
 
-**Live demo:** _add Vercel link here_
+**Live demo:**
 
 ![screenshot](./docs/screenshot.png)
 

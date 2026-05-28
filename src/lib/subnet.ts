@@ -15,6 +15,9 @@ export interface SubnetResult {
   maskBinary: string
   networkBinary: string
   broadcastBinary: string
+  ipHex: string
+  networkHex: string
+  maskHex: string
 }
 
 export function parseIP(ip: string): number[] {
@@ -40,6 +43,10 @@ export function cidrToMask(cidr: number): number {
 
 export function toBinaryString(n: number): string {
   return n.toString(2).padStart(32, '0')
+}
+
+export function intToHex(n: number): string {
+  return '0x' + n.toString(16).toUpperCase().padStart(8, '0')
 }
 
 export function formatBinary(n: number): string {
@@ -136,5 +143,8 @@ export function calculate(ip: string, cidr: number): SubnetResult {
     maskBinary: formatBinary(maskInt),
     networkBinary: formatBinary(networkInt),
     broadcastBinary: formatBinary(broadcastInt),
+    ipHex: intToHex(ipInt),
+    networkHex: intToHex(networkInt),
+    maskHex: intToHex(maskInt),
   }
 }
