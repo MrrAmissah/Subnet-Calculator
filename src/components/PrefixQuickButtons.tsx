@@ -8,7 +8,7 @@ interface Props {
 export default function PrefixQuickButtons({ currentCidr, onSelect }: Props) {
   return (
     <div>
-      <p className="mb-1.5 text-[10px] font-medium uppercase tracking-widest text-gray-500">
+      <p className="mb-1.5 text-[10px] font-medium uppercase tracking-widest text-fore-3">
         Quick select
       </p>
       <div className="flex flex-wrap gap-1.5">
@@ -17,10 +17,10 @@ export default function PrefixQuickButtons({ currentCidr, onSelect }: Props) {
             key={prefix}
             onClick={() => onSelect(prefix)}
             className={[
-              'rounded border px-2 py-1 font-mono text-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400/50',
+              'rounded border px-2 py-1 font-mono text-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-signal/50',
               currentCidr === prefix
-                ? 'border-cyan-400/40 bg-cyan-400/10 text-cyan-400'
-                : 'border-gray-700 bg-gray-900 text-gray-400 hover:border-gray-600 hover:text-gray-300',
+                ? 'border-signal/40 bg-signal/10 text-signal'
+                : 'border-edge-hi bg-raised text-fore-2 hover:border-edge hover:text-fore',
             ].join(' ')}
           >
             /{prefix}

@@ -7,9 +7,9 @@ interface Props {
 
 export default function DetailSection({ title, items }: Props) {
   return (
-    <div className="rounded border border-gray-800 bg-panel">
-      <div className="border-b border-gray-800 px-4 py-2.5">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+    <div className="rounded border border-edge bg-panel">
+      <div className="border-b border-edge px-4 py-2.5">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-fore-3">
           {title}
         </span>
       </div>

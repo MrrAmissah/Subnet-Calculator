@@ -17,9 +17,9 @@ function BinaryRow({
   let globalIdx = 0
 
   return (
-    <tr className="group border-t border-gray-800/70 first:border-0">
+    <tr className="border-t border-edge/70 first:border-0">
       <td className="whitespace-nowrap py-2 pr-4 align-middle">
-        <span className="text-[10px] font-medium uppercase tracking-widest text-gray-500">
+        <span className="text-[10px] font-medium uppercase tracking-widest text-fore-3">
           {label}
         </span>
       </td>
@@ -36,10 +36,10 @@ function BinaryRow({
                     className={[
                       'inline-flex h-[18px] w-[12px] items-center justify-center rounded-[2px] font-bold',
                       isNetwork
-                        ? 'bg-cyan-400/15 text-cyan-300'
+                        ? 'bg-signal/15 text-signal'
                         : bit === '1'
-                          ? 'bg-gray-800/60 text-gray-400'
-                          : 'text-gray-700',
+                          ? 'bg-edge/60 text-fore-2'
+                          : 'text-fore-3',
                     ].join(' ')}
                   >
                     {bit}
@@ -47,7 +47,7 @@ function BinaryRow({
                 )
               })}
               {oi < 3 && (
-                <span className="mx-0.5 select-none text-gray-700">.</span>
+                <span className="mx-0.5 select-none text-fore-3">.</span>
               )}
             </span>
           ))}
@@ -59,18 +59,18 @@ function BinaryRow({
 
 export default function BinaryView({ result }: Props) {
   return (
-    <div className="rounded border border-gray-800 bg-panel">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 px-4 py-2.5">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+    <div className="rounded border border-edge bg-panel">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-edge px-4 py-2.5">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-fore-3">
           Binary Breakdown
         </span>
-        <div className="flex items-center gap-4 text-[10px] text-gray-500">
+        <div className="flex items-center gap-4 text-[10px] text-fore-3">
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-[2px] bg-cyan-400/20 border border-cyan-400/30" />
+            <span className="inline-block h-3 w-3 rounded-[2px] border border-signal/30 bg-signal/20" />
             Network ({result.cidr} bits)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-[2px] bg-gray-800/80 border border-gray-700" />
+            <span className="inline-block h-3 w-3 rounded-[2px] border border-edge-hi bg-edge/60" />
             Host ({32 - result.cidr} bits)
           </span>
         </div>
@@ -78,10 +78,10 @@ export default function BinaryView({ result }: Props) {
       <div className="overflow-x-auto px-4 py-3">
         <table className="w-full min-w-[480px]">
           <tbody>
-            <BinaryRow label="IP Address" value={result.ipBinary} cidr={result.cidr} />
+            <BinaryRow label="IP Address" value={result.ipBinary}        cidr={result.cidr} />
             <BinaryRow label="Subnet Mask" value={result.maskBinary} />
-            <BinaryRow label="Network" value={result.networkBinary} cidr={result.cidr} />
-            <BinaryRow label="Broadcast" value={result.broadcastBinary} cidr={result.cidr} />
+            <BinaryRow label="Network"    value={result.networkBinary}   cidr={result.cidr} />
+            <BinaryRow label="Broadcast"  value={result.broadcastBinary} cidr={result.cidr} />
           </tbody>
         </table>
       </div>
