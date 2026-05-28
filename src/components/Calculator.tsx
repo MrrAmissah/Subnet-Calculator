@@ -4,6 +4,23 @@ import InputPanel from './InputPanel'
 import SummaryGrid from './SummaryGrid'
 import DetailSection from './DetailSection'
 import BinaryView from './BinaryView'
+import RangeBar from './RangeBar'
+import SplitPreview from './SplitPreview'
+
+const HISTORY_KEY = 'subnet-history'
+const HISTORY_MAX = 8
+
+function loadHistory(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
+  } catch {
+    return []
+  }
+}
+
+function saveHistory(entries: string[]) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(entries))
+}
 
 function readFromURL(): { ip: string; cidr: number } | null {
   const params = new URLSearchParams(window.location.search)
@@ -49,6 +66,16 @@ export default function Calculator() {
   const [cidr, setCidr] = useState(24)
   const [result, setResult] = useState<SubnetResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<string[]>(loadHistory)
+
+  const pushHistory = useCallback((entry: string) => {
+    setHistory(prev => {
+      const filtered = prev.filter(e => e !== entry)
+      const next = [entry, ...filtered].slice(0, HISTORY_MAX)
+      saveHistory(next)
+      return next
+    })
+  }, [])
 
   const compute = useCallback((rawInput: string, rawCidr: number) => {
     const str = rawInput.includes('/') ? rawInput : `${rawInput}/${rawCidr}`
@@ -68,14 +95,16 @@ export default function Calculator() {
     }
 
     try {
-      setResult(calculate(parsed.ip, parsed.cidr))
+      const r = calculate(parsed.ip, parsed.cidr)
+      setResult(r)
       setError(null)
       writeToURL(parsed.ip, parsed.cidr)
+      pushHistory(`${r.networkAddress}/${r.cidr}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Calculation error')
       setResult(null)
     }
-  }, [])
+  }, [pushHistory])
 
   useEffect(() => {
     const fromURL = readFromURL()
@@ -88,6 +117,24 @@ export default function Calculator() {
       compute('192.168.1.10/24', 24)
     }
   }, [compute])
+
+  // Keyboard shortcut: "/" focuses the CIDR input
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== '/') return
+      const target = e.target as HTMLElement
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT'
+      ) return
+      e.preventDefault()
+      const el = document.getElementById('cidr-input') as HTMLInputElement | null
+      if (el) { el.focus(); el.select() }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [])
 
   const handleInputChange = (value: string) => {
     setInput(value)
@@ -112,26 +159,33 @@ export default function Calculator() {
   return (
     <div className="space-y-4">
       {/* Two-column: input (left) + summary (right) */}
-      <div className="grid gap-4 lg:grid-cols-[400px_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[380px_1fr] lg:items-stretch">
         <InputPanel
           input={input}
           cidr={cidr}
           error={error}
+          history={history}
           onInputChange={handleInputChange}
           onCidrChange={handleCidrChange}
         />
-        <SummaryGrid result={result} />
+        <SummaryGrid result={result} onNavigate={handleInputChange} />
       </div>
 
       {/* Detail panels — 4-up on wide screens */}
       {details && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <DetailSection title="Address Range" items={details.addressRange} />
-          <DetailSection title="Masks" items={details.masks} />
-          <DetailSection title="Classification" items={details.classification} />
-          <DetailSection title="Technical" items={details.technical} />
+          <DetailSection title="Address Range"  items={details.addressRange}    color="signal" />
+          <DetailSection title="Masks"          items={details.masks}           color="ok" />
+          <DetailSection title="Classification" items={details.classification}  color="warn" />
+          <DetailSection title="Technical"      items={details.technical}       color="info" />
         </div>
       )}
+
+      {/* Subnet split preview */}
+      {result && <SplitPreview result={result} />}
+
+      {/* Address space range bar */}
+      {result && <RangeBar result={result} />}
 
       {/* Binary breakdown */}
       {result && <BinaryView result={result} />}

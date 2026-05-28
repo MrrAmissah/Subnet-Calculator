@@ -19,8 +19,8 @@ export default function PrefixQuickButtons({ currentCidr, onSelect }: Props) {
             className={[
               'rounded border px-2 py-1 font-mono text-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-signal/50',
               currentCidr === prefix
-                ? 'border-signal/40 bg-signal/10 text-signal'
-                : 'border-edge-hi bg-raised text-fore-2 hover:border-edge hover:text-fore',
+                ? 'border-signal/50 bg-signal/15 text-signal font-semibold'
+                : 'border-edge-hi bg-raised text-fore-2 hover:border-signal/40 hover:bg-signal/8 hover:text-signal',
             ].join(' ')}
           >
             /{prefix}

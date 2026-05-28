@@ -91,6 +91,77 @@ export function parseCIDRNotation(input: string): { ip: string; cidr: number } |
   return { ip, cidr }
 }
 
+export function isIPInSubnet(ip: string, networkAddress: string, broadcastAddress: string): boolean {
+  if (!validateIP(ip)) return false
+  const ipInt = octetsToInt(parseIP(ip))
+  const netInt = octetsToInt(parseIP(networkAddress))
+  const bcastInt = octetsToInt(parseIP(broadcastAddress))
+  return ipInt >= netInt && ipInt <= bcastInt
+}
+
+export function getAdjacentCIDRs(
+  networkAddress: string,
+  cidr: number,
+): { prev: string | null; next: string | null } {
+  if (cidr === 0) return { prev: null, next: null }
+  const netInt = octetsToInt(parseIP(networkAddress))
+  const subnetSize = Math.pow(2, 32 - cidr)
+  const maskInt = cidrToMask(cidr)
+  const wildcardInt = (~maskInt) >>> 0
+  const bcastInt = (netInt | wildcardInt) >>> 0
+
+  const prev = netInt >= subnetSize ? `${intToIP((netInt - subnetSize) >>> 0)}/${cidr}` : null
+  const next = bcastInt < 0xffffffff ? `${intToIP((bcastInt + 1) >>> 0)}/${cidr}` : null
+  return { prev, next }
+}
+
+export function splitSubnet(
+  networkAddress: string,
+  cidr: number,
+  targetCidr: number,
+): string[] {
+  if (targetCidr <= cidr || targetCidr > 32) return []
+  const count = Math.pow(2, targetCidr - cidr)
+  const subnetSize = Math.pow(2, 32 - targetCidr)
+  const results: string[] = []
+  let cur = octetsToInt(parseIP(networkAddress))
+  const limit = Math.min(count, 512)
+  for (let i = 0; i < limit; i++) {
+    results.push(`${intToIP(cur)}/${targetCidr}`)
+    cur = (cur + subnetSize) >>> 0
+  }
+  return results
+}
+
+export function formatReport(result: SubnetResult): string {
+  const scope = result.isPrivate ? 'Private (RFC 1918)' : 'Public'
+  const lines = [
+    `Subnet Report: ${result.networkAddress}/${result.cidr}`,
+    '='.repeat(40),
+    `Network Address : ${result.networkAddress}`,
+    `Broadcast       : ${result.broadcastAddress}`,
+    `Subnet Mask     : ${result.subnetMask}`,
+    `Wildcard Mask   : ${result.wildcardMask}`,
+    `First Host      : ${result.firstHost}`,
+    `Last Host       : ${result.lastHost}`,
+    `Total Addresses : ${result.totalAddresses.toLocaleString()}`,
+    `Usable Hosts    : ${result.usableHosts.toLocaleString()}`,
+    `CIDR Notation   : /${result.cidr}`,
+    `IP Class        : ${result.ipClass}`,
+    `Scope           : ${scope}`,
+    `IP Hex          : ${result.ipHex}`,
+    `Network Hex     : ${result.networkHex}`,
+    `Mask Hex        : ${result.maskHex}`,
+    '',
+    'Binary:',
+    `  IP Address  : ${result.ipBinary}`,
+    `  Subnet Mask : ${result.maskBinary}`,
+    `  Network     : ${result.networkBinary}`,
+    `  Broadcast   : ${result.broadcastBinary}`,
+  ]
+  return lines.join('\n')
+}
+
 export function calculate(ip: string, cidr: number): SubnetResult {
   if (!validateIP(ip)) throw new Error(`Invalid IP address: ${ip}`)
   if (!validateCIDR(cidr)) throw new Error(`Invalid CIDR prefix: ${cidr}`)

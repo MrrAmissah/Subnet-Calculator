@@ -18,12 +18,12 @@ function BinaryRow({
 
   return (
     <tr className="border-t border-edge/70 first:border-0">
-      <td className="whitespace-nowrap py-2 pr-4 align-middle">
+      <td className="whitespace-nowrap py-2.5 pr-6 align-middle">
         <span className="text-[10px] font-medium uppercase tracking-widest text-fore-3">
           {label}
         </span>
       </td>
-      <td className="py-2 align-middle">
+      <td className="py-2.5 align-middle">
         <div className="flex items-center gap-px font-mono text-xs leading-none">
           {parts.map((octet, oi) => (
             <span key={oi} className="flex items-center gap-px">
@@ -59,24 +59,24 @@ function BinaryRow({
 
 export default function BinaryView({ result }: Props) {
   return (
-    <div className="rounded border border-edge bg-panel">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-edge px-4 py-2.5">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-fore-3">
+    <div className="overflow-hidden rounded border border-edge bg-panel">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-signal px-4 py-2.5">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-canvas">
           Binary Breakdown
         </span>
-        <div className="flex items-center gap-4 text-[10px] text-fore-3">
+        <div className="flex items-center gap-5 text-[10px] text-canvas/70">
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-[2px] border border-signal/30 bg-signal/20" />
-            Network ({result.cidr} bits)
+            <span className="inline-block h-3 w-3 rounded-[2px] border border-black/20 bg-black/15" />
+            Network bits ({result.cidr})
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-[2px] border border-edge-hi bg-edge/60" />
-            Host ({32 - result.cidr} bits)
+            <span className="inline-block h-3 w-3 rounded-[2px] border border-black/20 bg-black/25" />
+            Host bits ({32 - result.cidr})
           </span>
         </div>
       </div>
       <div className="overflow-x-auto px-4 py-3">
-        <table className="w-full min-w-[480px]">
+        <table className="w-full min-w-[600px]">
           <tbody>
             <BinaryRow label="IP Address" value={result.ipBinary}        cidr={result.cidr} />
             <BinaryRow label="Subnet Mask" value={result.maskBinary} />

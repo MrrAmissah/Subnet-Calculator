@@ -11,6 +11,10 @@ import {
   validateCIDR,
   parseCIDRNotation,
   calculate,
+  isIPInSubnet,
+  getAdjacentCIDRs,
+  splitSubnet,
+  formatReport,
 } from './subnet'
 
 describe('parseIP', () => {
@@ -216,5 +220,87 @@ describe('calculate — invalid input', () => {
   it('throws on bad CIDR', () => {
     expect(() => calculate('10.0.0.0', -1)).toThrow('Invalid CIDR')
     expect(() => calculate('10.0.0.0', 33)).toThrow('Invalid CIDR')
+  })
+})
+
+describe('isIPInSubnet', () => {
+  it('returns true for IPs inside the subnet', () => {
+    expect(isIPInSubnet('192.168.1.1',   '192.168.1.0', '192.168.1.255')).toBe(true)
+    expect(isIPInSubnet('192.168.1.0',   '192.168.1.0', '192.168.1.255')).toBe(true)
+    expect(isIPInSubnet('192.168.1.255', '192.168.1.0', '192.168.1.255')).toBe(true)
+  })
+
+  it('returns false for IPs outside the subnet', () => {
+    expect(isIPInSubnet('192.168.2.1',   '192.168.1.0', '192.168.1.255')).toBe(false)
+    expect(isIPInSubnet('10.0.0.1',      '192.168.1.0', '192.168.1.255')).toBe(false)
+  })
+
+  it('returns false for invalid IP strings', () => {
+    expect(isIPInSubnet('bad.ip', '192.168.1.0', '192.168.1.255')).toBe(false)
+  })
+})
+
+describe('getAdjacentCIDRs', () => {
+  it('returns both neighbours for a mid-range /24', () => {
+    const { prev, next } = getAdjacentCIDRs('192.168.1.0', 24)
+    expect(prev).toBe('192.168.0.0/24')
+    expect(next).toBe('192.168.2.0/24')
+  })
+
+  it('returns null for prev when at the start of the address space', () => {
+    expect(getAdjacentCIDRs('0.0.0.0', 24).prev).toBeNull()
+  })
+
+  it('returns null for next when at the end of the address space', () => {
+    expect(getAdjacentCIDRs('255.255.255.0', 24).next).toBeNull()
+  })
+
+  it('returns null for both when cidr is 0', () => {
+    const { prev, next } = getAdjacentCIDRs('0.0.0.0', 0)
+    expect(prev).toBeNull()
+    expect(next).toBeNull()
+  })
+})
+
+describe('splitSubnet', () => {
+  it('splits a /24 into /25s', () => {
+    const results = splitSubnet('192.168.1.0', 24, 25)
+    expect(results).toHaveLength(2)
+    expect(results[0]).toBe('192.168.1.0/25')
+    expect(results[1]).toBe('192.168.1.128/25')
+  })
+
+  it('splits a /24 into /26s', () => {
+    const results = splitSubnet('10.0.0.0', 24, 26)
+    expect(results).toHaveLength(4)
+    expect(results[0]).toBe('10.0.0.0/26')
+    expect(results[3]).toBe('10.0.0.192/26')
+  })
+
+  it('caps results at 512', () => {
+    const results = splitSubnet('10.0.0.0', 16, 32)
+    expect(results).toHaveLength(512)
+  })
+
+  it('returns empty array when targetCidr <= cidr', () => {
+    expect(splitSubnet('10.0.0.0', 24, 24)).toEqual([])
+    expect(splitSubnet('10.0.0.0', 24, 16)).toEqual([])
+  })
+
+  it('returns empty array when targetCidr > 32', () => {
+    expect(splitSubnet('10.0.0.0', 24, 33)).toEqual([])
+  })
+})
+
+describe('formatReport', () => {
+  it('includes key fields in the output', () => {
+    const r = calculate('192.168.1.10', 24)
+    const report = formatReport(r)
+    expect(report).toContain('192.168.1.0/24')
+    expect(report).toContain('Network Address : 192.168.1.0')
+    expect(report).toContain('Broadcast       : 192.168.1.255')
+    expect(report).toContain('Usable Hosts    : 254')
+    expect(report).toContain('Private (RFC 1918)')
+    expect(report).toContain('Binary:')
   })
 })

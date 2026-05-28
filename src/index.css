@@ -1,38 +1,39 @@
 @import "tailwindcss";
 
-/* All design tokens registered here so Tailwind generates utilities.
-   Dark values are the defaults; light theme overrides them below. */
+/* Design tokens — dark (deep navy) is the default; light overrides below */
 @theme {
-  --color-canvas:   #070A0F;
-  --color-panel:    #0D1117;
-  --color-raised:   #111827;
-  --color-edge:     #1F2937;
-  --color-edge-hi:  #374151;
-  --color-fore:     #E5E7EB;
-  --color-fore-2:   #9CA3AF;
-  --color-fore-3:   #6B7280;
-  --color-signal:   #22D3EE;
-  --color-ok:       #22C55E;
-  --color-warn:     #F59E0B;
-  --color-fail:     #EF4444;
+  --color-canvas:  #0B1118;
+  --color-panel:   #111A24;
+  --color-raised:  #162231;
+  --color-edge:    #253447;
+  --color-edge-hi: #33465F;
+  --color-fore:    #E6EDF3;
+  --color-fore-2:  #A8B3C2;
+  --color-fore-3:  #748196;
+  --color-signal:  #22D3EE;
+  --color-ok:      #22C55E;
+  --color-warn:    #F59E0B;
+  --color-fail:    #EF4444;
+  --color-info:    #38BDF8;
 }
 
 @layer base {
-  /* ── Light theme overrides ───────────────────────────────────── */
+  /* ── Light theme ─────────────────────────────────────────────── */
   :root[data-theme="light"] {
-    --color-canvas:   #EEF2F7;
-    --color-panel:    #FFFFFF;
-    --color-raised:   #F3F4F6;
-    --color-edge:     #E5E7EB;
-    --color-edge-hi:  #D1D5DB;
-    --color-fore:     #111827;
-    --color-fore-2:   #4B5563;
-    --color-fore-3:   #9CA3AF;
-    --color-signal:   #0891B2;
-    --color-ok:       #16A34A;
-    --color-warn:     #D97706;
-    --color-fail:     #DC2626;
-    --dot-color:      rgba(15, 23, 42, 0.04);
+    --color-canvas:  #F3F7FA;
+    --color-panel:   #FFFFFF;
+    --color-raised:  #F8FAFC;
+    --color-edge:    #D8E1EA;
+    --color-edge-hi: #B8C6D6;
+    --color-fore:    #0F172A;
+    --color-fore-2:  #475569;
+    --color-fore-3:  #8492A6;
+    --color-signal:  #0891B2;
+    --color-ok:      #16A34A;
+    --color-warn:    #D97706;
+    --color-fail:    #DC2626;
+    --color-info:    #2563EB;
+    --dot-color:     rgba(15, 23, 42, 0.045);
     color-scheme: light;
   }
 
@@ -48,22 +49,45 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    /* dot-grid: dark uses a soft slate-blue tint, light uses a dark ink tint */
     background-image: radial-gradient(
-      var(--dot-color, rgba(255, 255, 255, 0.025)) 1px,
+      var(--dot-color, rgba(148, 163, 184, 0.055)) 1px,
       transparent 1px
     );
     background-size: 24px 24px;
   }
 
+  /* ── Light mode: card shadow + border ────────────────────────── */
+  :root[data-theme="light"] .bg-panel.rounded {
+    box-shadow:
+      0 1px 3px rgba(15, 23, 42, 0.07),
+      0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  /* ── Light mode: header elevation ───────────────────────────── */
+  :root[data-theme="light"] header.bg-panel {
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+  }
+
+  /* ── Light mode: input inset depth ──────────────────────────── */
+  :root[data-theme="light"] input[type="text"] {
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+  }
+
+  /* ── Dark mode: card inner top highlight ────────────────────── */
+  :root:not([data-theme="light"]) .bg-panel.rounded {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
   /* ── Range input ─────────────────────────────────────────────── */
-  input[type='range'] {
+  input[type="range"] {
     accent-color: var(--color-signal);
     height: 6px;
     border-radius: 3px;
     cursor: pointer;
   }
 
-  input[type='range']::-webkit-slider-thumb {
+  input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 14px;
     height: 14px;
@@ -74,13 +98,13 @@
     margin-top: -4px;
   }
 
-  input[type='range']::-webkit-slider-runnable-track {
+  input[type="range"]::-webkit-slider-runnable-track {
     background: var(--color-edge);
     height: 6px;
     border-radius: 3px;
   }
 
-  input[type='range']::-moz-range-thumb {
+  input[type="range"]::-moz-range-thumb {
     width: 14px;
     height: 14px;
     border-radius: 50%;
@@ -89,7 +113,7 @@
     border: 2px solid var(--color-canvas);
   }
 
-  input[type='range']::-moz-range-track {
+  input[type="range"]::-moz-range-track {
     background: var(--color-edge);
     height: 6px;
     border-radius: 3px;

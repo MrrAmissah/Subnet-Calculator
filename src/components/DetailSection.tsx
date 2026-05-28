@@ -1,15 +1,27 @@
 import ResultCard, { type ResultCardProps } from './ResultCard'
 
+type Color = 'signal' | 'ok' | 'warn' | 'info'
+
+const HEADER = {
+  signal: 'bg-signal',
+  ok:     'bg-ok',
+  warn:   'bg-warn',
+  info:   'bg-info',
+}
+
 interface Props {
   title: string
   items: ResultCardProps[]
+  color?: Color
 }
 
-export default function DetailSection({ title, items }: Props) {
+export default function DetailSection({ title, items, color }: Props) {
+  const headerBg = color ? HEADER[color] : null
+
   return (
-    <div className="rounded border border-edge bg-panel">
-      <div className="border-b border-edge px-4 py-2.5">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-fore-3">
+    <div className="overflow-hidden rounded border border-edge bg-panel">
+      <div className={['border-b border-black/10 px-4 py-2.5', headerBg ?? 'border-edge bg-panel'].join(' ')}>
+        <span className={['text-[10px] font-semibold uppercase tracking-widest', headerBg ? 'text-canvas' : 'text-fore-3'].join(' ')}>
           {title}
         </span>
       </div>
